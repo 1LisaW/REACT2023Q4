@@ -13,7 +13,7 @@ async function getData(entry: string, options: string): Promise<StarshipsDTO | n
     });
     if (!response.ok) {
       console.log('Failed to get what I want, got status: ' + response.status);
-      return (null);
+      return null;
     }
     return response.json();
   } catch (e) {

@@ -9,7 +9,6 @@ type SearchProps = {
 };
 
 class Search extends Component<SearchProps> {
-
   handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     this.props.onChange(event.target.value);
   };

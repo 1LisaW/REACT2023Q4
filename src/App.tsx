@@ -16,12 +16,7 @@ export type SearchState = {
 };
 
 class App extends Component<Record<string, never>, SearchState> {
-  state: {
-    searchText: string;
-    searchData: StarshipModel[] | null;
-    isLoading: boolean;
-    hasError: boolean;
-  } = {
+  state: SearchState = {
     searchText: '',
     searchData: null,
     isLoading: false,
