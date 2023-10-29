@@ -1,3 +1,3 @@
-import { StarshipDTO } from "../api/starships";
+import { StarshipDTO } from '../api/starships';
 
-export type StarshipModel = Omit<StarshipDTO, "url"> & {"img": string}
+export type StarshipModel = Omit<StarshipDTO, 'url'> & { img: string };

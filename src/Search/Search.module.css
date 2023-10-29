@@ -1,13 +1,13 @@
 .searchWrapper {
-	min-width: 800px;
+  min-width: 800px;
 }
 
 .inputSearch {
-	width: 40%;
-    margin-right: 20px;
-    height: 25px;
+  width: 40%;
+  margin-right: 20px;
+  height: 25px;
 }
 
 .buttonSearch {
-	margin-right: 10px;
+  margin-right: 10px;
 }
