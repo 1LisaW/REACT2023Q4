@@ -1,4 +1,4 @@
-import { ChangeEvent, Component } from 'react';
+import { ChangeEvent } from 'react';
 import classes from './Search.module.css';
 
 type SearchProps = {
@@ -8,35 +8,33 @@ type SearchProps = {
   onError: () => void;
 };
 
-class Search extends Component<SearchProps> {
-  handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    this.props.onChange(event.target.value);
+const Search = (props: SearchProps) => {
+  const { searchText, onChange, onError, onSubmit } = props;
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    onChange(event.target.value);
   };
 
-  handleClick = () => {
-    this.props.onSubmit(this.props.searchText);
+  const handleClick = () => {
+    onSubmit(searchText);
   };
-  handleClickErr = () => {
-    this.props.onError();
+  const handleClickErr = () => {
+    onError();
   };
-  render() {
-    const { searchText } = this.props;
-    return (
-      <div className={classes.searchWrapper}>
-        <input
-          className={classes.inputSearch}
-          value={searchText}
-          onChange={this.handleChange}
-        ></input>
-        <button className={classes.buttonSearch} onClick={this.handleClick}>
-          Search
-        </button>
-        <button className={classes.buttonSearch} onClick={this.handleClickErr}>
-          Error
-        </button>
-      </div>
-    );
-  }
+  return (
+    <div className={classes.searchWrapper}>
+      <input
+        className={classes.inputSearch}
+        value={searchText}
+        onChange={handleChange}
+      ></input>
+      <button className={classes.buttonSearch} onClick={handleClick}>
+        Search
+      </button>
+      <button className={classes.buttonSearch} onClick={handleClickErr}>
+        Error
+      </button>
+    </div>
+  );
 }
 
 export default Search;

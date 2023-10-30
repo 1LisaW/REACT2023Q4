@@ -8,7 +8,7 @@ export function setStorageData(state: SearchState) {
 export function getStorageData(): SearchState {
   const store: SearchState = {
     searchText: '',
-    searchData: null,
+    searchData: [],
     isLoading: false,
     hasError: false,
   };

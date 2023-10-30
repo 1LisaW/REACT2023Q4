@@ -26,10 +26,10 @@ async function getStarshipsData(searchText: string): Promise<StarshipsDTO | null
   return await getData('starships', searchText);
 }
 
-export async function getStarships(searchText: string): Promise<StarshipModel[] | null> {
+export async function getStarships(searchText: string): Promise<StarshipModel[] | never[]> {
   const starships = await getStarshipsData(searchText);
 
-  if (!starships) return null;
+  if (!starships) return [];
   return starships.results.map((starship) => {
     const { url, ...rest } = starship;
 

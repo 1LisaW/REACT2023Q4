@@ -1,76 +1,70 @@
-import { Component } from 'react';
 import './App.css';
 import Search from './Search/Search';
-import React from 'react';
+import { useEffect, useState } from 'react';
 import SearchResult from './Result/SearchResult';
 import { StarshipModel } from './model/starships';
 import { getStarships } from './api/api';
-import { getStorageData, setStorageData } from './store/storage';
+import { getStorageData } from './store/storage';
 import Spinner from './Spinner/Spinner';
 
 export type SearchState = {
   searchText: string;
-  searchData: StarshipModel[] | null;
+  searchData: StarshipModel[] | never[];
   isLoading: boolean;
   hasError: boolean;
 };
 
-class App extends Component<Record<string, never>, SearchState> {
-  state: SearchState = {
-    searchText: '',
-    searchData: null,
-    isLoading: false,
-    hasError: false,
-  };
+const App = () => {
+  const [searchText, setSearchText] = useState<string>("");
+  const [searchData, setSearchData] = useState<StarshipModel[] | null>(null);
+  const [isLoading, setIsLoading] =useState<boolean>(false);
+  const [hasError, setHasError] = useState<boolean>(false);
 
-  componentDidMount(): void {
-    const dataFromStore = getStorageData();
-    if (dataFromStore.searchData) this.setState({ ...getStorageData() });
-    else this.update_data_from_api(this.state.searchText);
-  }
-
-  componentDidUpdate(): void {
-    if (this.state.hasError) throw new Error('Uncaught error:');
-  }
-
-  handleSearchChange = (value: string) => {
-    this.setState({
-      searchText: value,
-    });
-  };
-
-  private async update_data_from_api(searchText: string) {
-    this.setState({ isLoading: true });
+  const  updateDataFromApi = async (searchText: string) => {
+    setIsLoading(true);
     const data = await getStarships(searchText);
-    this.setState({
-      searchData: data,
-      isLoading: false,
-    });
-    setStorageData({ ...this.state, searchData: data });
+    setSearchData([...data]);
+    setIsLoading(false);
+    setSearchData([...data ]);
   }
 
-  handleSearchSubmit = async (searchText: string) => {
-    await this.update_data_from_api(searchText);
+ useEffect(() => {
+    const dataFromStore = getStorageData();
+    if (dataFromStore.searchData)
+      setSearchData([...dataFromStore.searchData]);
+    else
+      updateDataFromApi(searchText);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (hasError) throw new Error('Uncaught error:');
+  }, [hasError])
+
+  const handleSearchChange = (value: string) => {
+    setSearchText(value);
   };
 
-  handleShowError = () => {
-    this.setState({ hasError: true });
+  const handleSearchSubmit = async (searchText: string) => {
+    await updateDataFromApi(searchText);
   };
 
-  render() {
-    return (
-      <React.Fragment>
-        <Search
-          searchText={this.state.searchText}
-          onChange={this.handleSearchChange}
-          onSubmit={this.handleSearchSubmit}
-          onError={this.handleShowError}
-        />
-        {this.state.isLoading && <Spinner />}
-        {this.state.isLoading || <SearchResult searchData={this.state.searchData} />}
-      </React.Fragment>
-    );
-  }
+  const handleShowError = () => {
+    setHasError(true);
+  };
+
+  return (
+    <>
+      <Search
+        searchText={searchText}
+        onChange={handleSearchChange}
+        onSubmit={handleSearchSubmit}
+        onError={handleShowError}
+      />
+      {isLoading && <Spinner />}
+      {isLoading || <SearchResult searchData={searchData} />}
+    </>
+  );
 }
 
 export default App;
