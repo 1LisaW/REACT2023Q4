@@ -3,6 +3,10 @@
     "prettier --write",
     "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   ],
+  "*.tsx": [
+    "prettier --write",
+    "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
+  ],
   "*.html": [
     "prettier --write"
   ],
