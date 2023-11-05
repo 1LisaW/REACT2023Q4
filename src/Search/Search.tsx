@@ -1,40 +1,24 @@
-import { ChangeEvent } from 'react';
 import classes from './Search.module.css';
+import { Form, useSearchParams } from 'react-router-dom';
 
-type SearchProps = {
-  searchText: string;
-  onChange: (value: string) => void;
-  onSubmit: (searchText: string) => void;
-  onError: () => void;
-};
-
-const Search = (props: SearchProps) => {
-  const { searchText, onChange, onError, onSubmit } = props;
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    onChange(event.target.value);
-  };
-
-  const handleClick = () => {
-    onSubmit(searchText);
-  };
-  const handleClickErr = () => {
-    onError();
-  };
+const Search = () => {
+  const [searchParams] = useSearchParams();
   return (
-    <div className={classes.searchWrapper}>
+    <Form className={classes.searchWrapper} role="search" relative="path">
+      <input type="hidden" name="pageSize" value={searchParams.get('pageSize') || ''} />
+      <input type="hidden" name="page" value={searchParams.get('page') || '1'} />
       <input
         className={classes.inputSearch}
-        value={searchText}
-        onChange={handleChange}
+        aria-label="search"
+        placeholder="Search"
+        type="search"
+        name="name"
+        defaultValue={searchParams.get('name') || ''}
       ></input>
-      <button className={classes.buttonSearch} onClick={handleClick}>
-        Search
-      </button>
-      <button className={classes.buttonSearch} onClick={handleClickErr}>
-        Error
-      </button>
-    </div>
+      <button className={classes.buttonSearch}>Search</button>
+      <button className={classes.buttonSearch}>Error</button>
+    </Form>
   );
-}
+};
 
 export default Search;

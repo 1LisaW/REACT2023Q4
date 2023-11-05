@@ -1,13 +1,25 @@
-import { StarshipModel } from '../model/starships';
-import { StarshipsDTO } from './starships';
+import { Color, MTGCardDTO } from './mtg';
 
-const API_URL = 'https://swapi.dev/api/';
-const IMG_URL = 'https://starwars-visualguide.com/assets/img/';
 export const MOCK_IMG = 'https://starwars-visualguide.com/assets/img/big-placeholder.jpg';
+const MTG_API_URL = 'https://api.magicthegathering.io/v1/';
 
-async function getData(entry: string, options: string): Promise<StarshipsDTO | null> {
+type MTGOptions = {
+  pageSize: number;
+  page: number;
+  name: string;
+};
+
+async function getMTGData(
+  entry: string,
+  options: MTGOptions,
+): Promise<{ cards: MTGCardDTO[] } | null> {
   try {
-    const response: Response = await fetch(`${API_URL}${entry}?search=${options}`, {
+    let queryParams =
+      Object.entries(options)
+        .map((arr) => arr.join('='))
+        .join('&') || '';
+    if (queryParams) queryParams = `?${queryParams}`;
+    const response: Response = await fetch(`${MTG_API_URL}${entry}${queryParams}`, {
       method: 'GET',
       mode: 'cors',
     });
@@ -22,27 +34,92 @@ async function getData(entry: string, options: string): Promise<StarshipsDTO | n
   }
 }
 
-async function getStarshipsData(searchText: string): Promise<StarshipsDTO | null> {
-  return await getData('starships', searchText);
+async function getMTGDetailData(
+  entry: string,
+  id: string,
+): Promise<{ card: MTGCardDTO } | null> {
+  try {
+    const response: Response = await fetch(`${MTG_API_URL}${entry}/${id}`, {
+      method: 'GET',
+      mode: 'cors',
+    });
+    if (!response.ok) {
+      console.log('Failed to get what I want, got status: ' + response.status);
+      return null;
+    }
+    return response.json();
+  } catch (e) {
+    console.log('An error!');
+    return null;
+  }
 }
 
-export async function getStarships(searchText: string): Promise<StarshipModel[] | never[]> {
-  const starships = await getStarshipsData(searchText);
+export interface MTGModel {
+  name: string;
+  manaCost: string;
+  cmc: string;
+  colors: (keyof typeof Color)[];
+  type: string;
+  set: string;
+  setName: string;
+  artist: string;
+  imageUrl: string;
+  id: string;
+}
 
-  if (!starships) return [];
-  return starships.results.map((starship) => {
-    const { url, ...rest } = starship;
+export async function getMTGCards(
+  entry: string,
+  options: MTGOptions,
+): Promise<MTGModel[] | never[]> {
+  const MTGCards = await getMTGData(entry, options);
 
-    let img;
-    const idxArr = url.match('/([0-9])+/');
-    if (!idxArr) img = MOCK_IMG;
-    else img = `${IMG_URL}starships/${idxArr[1]}.jpg`;
-
-    const starshipStore: StarshipModel = {
-      ...rest,
-      img: img,
+  if (!MTGCards) return [];
+  return MTGCards.cards.map((MTGCard) => {
+    const MTGCardsStore: MTGModel = {
+      name: MTGCard.name,
+      manaCost: MTGCard.manaCost,
+      cmc: String(MTGCard.cmc),
+      colors: MTGCard.colors,
+      type: MTGCard.type,
+      set: MTGCard.set,
+      setName: MTGCard.setName,
+      artist: MTGCard.artist,
+      imageUrl: MTGCard.imageUrl,
+      id: MTGCard.id,
     };
 
-    return starshipStore;
+    return MTGCardsStore;
   });
+}
+
+export async function getMTGCardsDetail(
+  entry: string,
+  id: string,
+): Promise<MTGModel | null> {
+  const MTGCards = await getMTGDetailData(entry, id);
+
+  if (!MTGCards) return null;
+  const MTGCardsStore: MTGModel = {
+    name: MTGCards.card.name,
+    manaCost: MTGCards.card.manaCost,
+    cmc: String(MTGCards.card.cmc),
+    colors: MTGCards.card.colors,
+    type: MTGCards.card.type,
+    set: MTGCards.card.set,
+    setName: MTGCards.card.setName,
+    artist: MTGCards.card.artist,
+    imageUrl: MTGCards.card.imageUrl,
+    id: MTGCards.card.id,
+  };
+  return MTGCardsStore;
+}
+
+export async function getMTGCardsData(
+  options: MTGOptions,
+): Promise<MTGModel[] | never[]> {
+  return await getMTGCards('cards', options);
+}
+
+export async function getMTGCardsDataDetail(id: string): Promise<MTGModel | null> {
+  return await getMTGCardsDetail('cards', id);
 }

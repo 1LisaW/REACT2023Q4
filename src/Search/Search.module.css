@@ -1,5 +1,8 @@
 .searchWrapper {
   min-width: 800px;
+  position: sticky;
+  top: 15px;
+  bottom: 80%;
 }
 
 .inputSearch {

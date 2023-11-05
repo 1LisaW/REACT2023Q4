@@ -1,5 +1,4 @@
 .card {
-  min-width: 800px;
   display: flex;
   flex-direction: row;
   width: 100%;
@@ -7,17 +6,17 @@
   border-radius: 25px;
   background-color: rgb(28, 28, 28);
   margin: 10px 0;
+  box-sizing: border-box;
 }
 
 .cardImg {
-  width: 250px;
-  height: 350px;
+  width: 80px;
   min-width: 50px;
   min-height: 50px;
   background-size: contain;
   background-repeat: no-repeat;
-  border-radius: 22px 0 0 0;
-  flex: 1;
+  border-radius: 8px;
+  flex-shrink: 1;
 }
 
 .heading {
@@ -35,6 +34,7 @@
   padding: 0;
   list-style: none;
   display: flex;
+  flex-direction: column;
   flex-wrap: wrap;
   justify-content: space-between;
   row-gap: 10px;
@@ -48,6 +48,5 @@
   line-height: 20px;
   padding: 0 7px 0 0;
   margin: 0;
-  flex-basis: 50%;
   box-sizing: border-box;
 }
