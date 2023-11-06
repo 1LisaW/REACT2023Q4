@@ -1,7 +1,10 @@
 import { MTGModel } from '../../api/api';
 import classes from './Card.module.css';
 
-const nameFields: Omit<MTGModel,'colors' | 'name' | 'imageUrl' | 'id' | 'set' | 'setName' | 'artist' | 'cmc'> = {
+const nameFields: Omit<
+  MTGModel,
+  'colors' | 'name' | 'imageUrl' | 'id' | 'set' | 'setName' | 'artist' | 'cmc'
+> = {
   manaCost: 'mana cost',
   type: 'type',
 };
@@ -11,7 +14,7 @@ const Card = (props: MTGModel) => {
     <section className={classes.card} key={`section_${props.id}`}>
       <div
         className={classes.cardImg}
-        style={{ backgroundImage: `url(${props.imageUrl}`}}
+        style={{ backgroundImage: `url(${props.imageUrl}` }}
         key={`img_${props.id}`}
       ></div>
       <div className={classes.cardContent} key={`content_${props.id}`}>

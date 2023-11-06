@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import Header from '../Header/Header';
 
 const Root = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [pageSize, setPageSize] = useState(parseInt(searchParams.get('pageSize') || '3'));
@@ -13,9 +13,9 @@ const Root = () => {
 
   useEffect(() => {
     if (window.location.pathname === '/') {
-        navigate({
-          pathname: "/cards",
-      })
+      navigate({
+        pathname: '/cards',
+      });
     }
   }, []);
 

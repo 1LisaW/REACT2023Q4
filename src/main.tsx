@@ -13,23 +13,29 @@ const router = createBrowserRouter([
   {
     path: '/',
     element: <Root />,
-    errorElement : <ErrorPage/>,
-    children: [{
-      path: "/cards",
-      loader: resLoader,
-      shouldRevalidate: (args) => {
-       return ![...args.currentUrl.searchParams.keys()].every(key => (
-        key === 'details' || args.currentUrl.searchParams.get(key) === args.nextUrl.searchParams.get(key)
-        ))
-      },
-      element: <SearchResult />,
+    errorElement: <ErrorPage />,
+    children: [
+      {
+        path: '/cards',
+        loader: resLoader,
+        shouldRevalidate: (args) => {
+          return ![...args.currentUrl.searchParams.keys()].every(
+            (key) =>
+              key === 'details' ||
+              args.currentUrl.searchParams.get(key) ===
+                args.nextUrl.searchParams.get(key),
+          );
+        },
+        element: <SearchResult />,
 
-      children: [{
-        path: "",
-        element: <Details />,
-      }]
-    },
-    ]
+        children: [
+          {
+            path: '',
+            element: <Details />,
+          },
+        ],
+      },
+    ],
   },
 ]);
 
