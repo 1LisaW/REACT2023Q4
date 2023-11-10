@@ -1,14 +1,16 @@
-import { useState, useEffect } from 'react';
-
-import { LoaderFunction, useSearchParams, useNavigate } from 'react-router-dom';
-import Spinner from '../../Spinner/Spinner';
+import {
+  LoaderFunction,
+  useSearchParams,
+  useNavigate,
+  useLoaderData,
+  createSearchParams,
+} from 'react-router-dom';
 import { MTGModel, getMTGCardsDataDetail } from '../../api/api';
 
 import classes from './Details.module.css';
 
-export const loader: LoaderFunction = async ({ request }): Promise<MTGModel | null> => {
-  const url = new URL(request.url);
-  const id = url.searchParams.get('details') || '';
+export const loader: LoaderFunction = async ({ params }): Promise<MTGModel | null> => {
+  const id = params.id;
   if (!id) {
     return null;
   }
@@ -25,44 +27,14 @@ const nameFields: Omit<MTGModel, 'colors' | 'name' | 'imageUrl' | 'id'> = {
   artist: 'artist',
 };
 
-const useCurrentUrl = () => {
-  const [searchParams] = useSearchParams();
-
-  return (
-    '?' +
-    ['pageSize', 'page', 'name']
-      .map((key) => `${key}=${searchParams.get(key) || ''}`)
-      .join('&')
-  );
-};
-
 const Details = () => {
-  const url = useCurrentUrl();
   const navigate = useNavigate();
-
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [details, setDetails] = useState<MTGModel | null>(null);
+  const details = useLoaderData() as MTGModel | null;
   const [searchParams] = useSearchParams();
-  const currentId = searchParams.get('details');
-
-  useEffect(() => {
-    (async () => {
-      if (!currentId) {
-        setDetails(null);
-        setIsLoading(false);
-      } else {
-        setIsLoading(true);
-        const searchData = await getMTGCardsDataDetail(currentId);
-        setDetails(searchData);
-        setIsLoading(false);
-      }
-    })();
-  }, [currentId]);
 
   return (
     <>
-      {isLoading && <Spinner />}
-      {!isLoading && details && (
+      {details && (
         <div className={classes.details}>
           <h2 className={classes.heading}>{details.name}</h2>
           <div className={classes.detailsInfo}>
@@ -88,8 +60,12 @@ const Details = () => {
           </div>
           <button
             onClick={() => {
-              setDetails(null);
-              navigate(url);
+              const searchParamsText = `?${createSearchParams({
+                name: searchParams.get('name') || '',
+                page: searchParams.get('page') || '1',
+                pageSize: searchParams.get('pageSize') || '3',
+              })}`;
+              navigate(`../..${searchParamsText}`, { relative: 'path' });
             }}
           >
             Close

@@ -1,84 +1,85 @@
 import classes from './SearchResult.module.css';
 import Card from './Card/Card';
 import {
-  LoaderFunction,
-  useLoaderData,
   useNavigation,
   useOutletContext,
-  Link,
   useSearchParams,
   Outlet,
+  useNavigate,
+  createSearchParams,
+  useParams,
 } from 'react-router-dom';
-import { MTGModel, getMTGCardsData } from '../api/api';
+import { MTGModel } from '../api/api';
 import Spinner from '../Spinner/Spinner';
-
-export const loader: LoaderFunction = async ({
-  request,
-}): Promise<MTGModel[] | never[]> => {
-  const url = new URL(request.url);
-  const search = url.searchParams.get('name') || '';
-  const pageSize = url.searchParams.get('pageSize') || '';
-  const page = url.searchParams.get('page') || '';
-  const searchData = await getMTGCardsData({
-    name: search,
-    pageSize: Number(pageSize) || 3,
-    page: Number(page) || 1,
-  });
-  return searchData;
-};
+import { useStateStore } from '../StateContext/SearchContext';
 
 type OutletProps = {
   page: number;
   onClick: (value: number) => void;
 };
 
-const useCurrentUrl = () => {
-  const [searchParams] = useSearchParams();
-
-  return (
-    '?' +
-    ['pageSize', 'page', 'name']
-      .map((key) => `${key}=${searchParams.get(key) || ''}`)
-      .join('&')
-  );
-};
-
 const SearchResult = () => {
-  const url = useCurrentUrl();
   const [searchParams] = useSearchParams();
-  const currentId = searchParams.get('details');
-
+  const { id: currId } = useParams();
   const content: OutletProps = useOutletContext();
-  const searchData = useLoaderData() as MTGModel[] | never[];
-  const { state } = useNavigation();
+  const navigation = useNavigation();
+  const { text, result } = useStateStore();
+  const navigate = useNavigate();
+
+  const goToDetails = (id: string) => {
+    const searchParamsText = `?${createSearchParams({
+      name: text,
+      page: searchParams.get('page') || '1',
+      pageSize: searchParams.get('pageSize') || '3',
+    })}`;
+    if (currId !== id) {
+      navigate(
+        {
+          pathname: `details/${id}`,
+          search: searchParamsText,
+        },
+        { replace: false },
+      );
+    } else {
+      navigate(`../..${searchParamsText}`, { relative: 'path' });
+    }
+  };
+
   const handleClick = (value: number) => {
     content.onClick(value);
   };
+
   return (
     <>
       <div className={classes.main}>
         <div className={classes.list}>
-          {state === 'loading' ? (
+          {navigation.state == 'loading' && navigation.location.pathname == '/cards' ? (
             <Spinner />
           ) : (
-            searchData &&
-            searchData.map((item: MTGModel) => {
+            result &&
+            result.map((item: MTGModel) => {
               return (
-                <Link
-                  to={currentId === item.id ? url : `${url}&details=${item.id}`}
+                <a
+                  onClick={() => {
+                    goToDetails(item.id);
+                  }}
                   key={item.id}
                 >
                   <Card {...item} />
-                </Link>
+                </a>
               );
             })
           )}
         </div>
         <div className={classes.details}>
-          <Outlet></Outlet>
+          {navigation.state == 'loading' && navigation.location.pathname !== '/cards' ? (
+            <Spinner />
+          ) : (
+            <Outlet></Outlet>
+          )}
         </div>
       </div>
-      {state !== 'loading' && (
+      {(navigation.state !== 'loading' || navigation.location.pathname !== '/cards') && (
         <div className={classes.paginationWrapper}>
           <button
             disabled={content.page === 1 ? true : false}
