@@ -19,6 +19,12 @@
   padding: 0 0 80px;
 }
 
+.noData {
+  width: 60%;
+  font-size: 2rem;
+  text-align:right;
+}
+
 .details {
   flex: 1;
   padding: 0 0 0 30px;

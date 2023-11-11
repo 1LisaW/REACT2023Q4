@@ -13,7 +13,7 @@ interface StateModel extends StoreModel {
   actions: ActionsModel;
 }
 
-const DEFAULT_STATE: StateModel = {
+export const DEFAULT_STATE: StateModel = {
   text: '',
   result: [],
   actions: {
@@ -63,8 +63,8 @@ export const useCustomState = (defaultState = DEFAULT_STATE) => {
   };
 };
 
-export const StateProvider = ({ children }: { children: ReactNode }) => {
-  const state = useCustomState();
+export const StateProvider = ({ children, defaultState=DEFAULT_STATE }: { children: ReactNode, defaultState?: StateModel }) => {
+  const state = useCustomState(defaultState);
 
   return <StateContext.Provider value={state}>{children}</StateContext.Provider>;
 };

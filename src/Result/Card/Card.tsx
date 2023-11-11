@@ -11,7 +11,7 @@ const nameFields: Omit<
 
 const Card = (props: MTGModel) => {
   return (
-    <section className={classes.card} key={`section_${props.id}`}>
+    <section className={classes.card} key={`section_${props.id}`} data-testid="card">
       <div
         className={classes.cardImg}
         style={{ backgroundImage: `url(${props.imageUrl}` }}

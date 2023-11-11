@@ -51,12 +51,12 @@ const SearchResult = () => {
 
   return (
     <>
-      <div className={classes.main}>
-        <div className={classes.list}>
+      <div className={classes.main} data-testid="cards">
+        <div className={classes.list} >
           {navigation.state == 'loading' && navigation.location.pathname == '/cards' ? (
             <Spinner />
           ) : (
-            result &&
+            result && result.length > 0 ?
             result.map((item: MTGModel) => {
               return (
                 <a
@@ -68,7 +68,9 @@ const SearchResult = () => {
                   <Card {...item} />
                 </a>
               );
-            })
+            }) : (
+            <div className={classes.noData} data-testid="noData">No cards found</div>
+            )
           )}
         </div>
         <div className={classes.details}>
@@ -79,7 +81,7 @@ const SearchResult = () => {
           )}
         </div>
       </div>
-      {(navigation.state !== 'loading' || navigation.location.pathname !== '/cards') && (
+      {(navigation.state !== 'loading' || navigation.location.pathname !== '/cards') && result.length > 0 && (
         <div className={classes.paginationWrapper}>
           <button
             disabled={content.page === 1 ? true : false}
