@@ -63,7 +63,13 @@ export const useCustomState = (defaultState = DEFAULT_STATE) => {
   };
 };
 
-export const StateProvider = ({ children, defaultState=DEFAULT_STATE }: { children: ReactNode, defaultState?: StateModel }) => {
+export const StateProvider = ({
+  children,
+  defaultState = DEFAULT_STATE,
+}: {
+  children: ReactNode;
+  defaultState?: StateModel;
+}) => {
   const state = useCustomState(defaultState);
 
   return <StateContext.Provider value={state}>{children}</StateContext.Provider>;

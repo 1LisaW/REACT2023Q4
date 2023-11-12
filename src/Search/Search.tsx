@@ -1,19 +1,15 @@
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import { useStateStore } from '../StateContext/SearchContext';
 import classes from './Search.module.css';
 import { Form, useSearchParams } from 'react-router-dom';
+import { getStorageData, setStorageData } from '../store/storage';
 
 const Search = () => {
   const [searchParams] = useSearchParams();
   const {
-    text,
     actions: { setText },
   } = useStateStore();
-  const [searchText, setSearchText] = useState(text || '');
-
-  useEffect(() => {
-    setSearchText(text);
-  }, [text]);
+  const [searchText, setSearchText] = useState(getStorageData() || '');
 
   return (
     <Form
@@ -22,6 +18,7 @@ const Search = () => {
       relative="path"
       onSubmit={() => {
         setText(searchText);
+        setStorageData(searchText);
       }}
     >
       <input type="hidden" name="pageSize" value={searchParams.get('pageSize') || ''} />

@@ -10,7 +10,7 @@ const ErrorPage = (): JSX.Element => {
   else if (typeof error === 'string') errMessage = error;
   else errMessage = 'Unknown error';
   return (
-    <div>
+    <div data-testid={'ErrorPage'}>
       <h1>Oops...</h1>
       <p>page not found.</p>
       <p>{errMessage}</p>

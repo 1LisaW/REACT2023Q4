@@ -2,7 +2,6 @@ import classes from './SearchResult.module.css';
 import Card from './Card/Card';
 import {
   useNavigation,
-  useOutletContext,
   useSearchParams,
   Outlet,
   useNavigate,
@@ -12,16 +11,11 @@ import {
 import { MTGModel } from '../api/api';
 import Spinner from '../Spinner/Spinner';
 import { useStateStore } from '../StateContext/SearchContext';
-
-type OutletProps = {
-  page: number;
-  onClick: (value: number) => void;
-};
+import Pagination from './Pagination/Pagination';
 
 const SearchResult = () => {
   const [searchParams] = useSearchParams();
   const { id: currId } = useParams();
-  const content: OutletProps = useOutletContext();
   const navigation = useNavigation();
   const { text, result } = useStateStore();
   const navigate = useNavigate();
@@ -45,18 +39,13 @@ const SearchResult = () => {
     }
   };
 
-  const handleClick = (value: number) => {
-    content.onClick(value);
-  };
-
   return (
     <>
       <div className={classes.main} data-testid="cards">
-        <div className={classes.list} >
+        <div className={classes.list}>
           {navigation.state == 'loading' && navigation.location.pathname == '/cards' ? (
             <Spinner />
-          ) : (
-            result && result.length > 0 ?
+          ) : result && result.length > 0 ? (
             result.map((item: MTGModel) => {
               return (
                 <a
@@ -64,13 +53,16 @@ const SearchResult = () => {
                     goToDetails(item.id);
                   }}
                   key={item.id}
+                  data-testid="card"
                 >
                   <Card {...item} />
                 </a>
               );
-            }) : (
-            <div className={classes.noData} data-testid="noData">No cards found</div>
-            )
+            })
+          ) : (
+            <div className={classes.noData} data-testid="noData">
+              No cards found
+            </div>
           )}
         </div>
         <div className={classes.details}>
@@ -81,23 +73,8 @@ const SearchResult = () => {
           )}
         </div>
       </div>
-      {(navigation.state !== 'loading' || navigation.location.pathname !== '/cards') && result.length > 0 && (
-        <div className={classes.paginationWrapper}>
-          <button
-            disabled={content.page === 1 ? true : false}
-            onClick={() => handleClick(content.page - 1)}
-          >
-            Left
-          </button>
-          <div>{content.page}</div>
-          <button
-            disabled={content.page === 10 ? true : false}
-            onClick={() => handleClick(content.page + 1)}
-          >
-            Right
-          </button>
-        </div>
-      )}
+      {(navigation.state !== 'loading' || navigation.location.pathname !== '/cards') &&
+        result.length > 0 && <Pagination />}
     </>
   );
 };

@@ -34,9 +34,12 @@ const Details = () => {
 
   return (
     <>
+      {console.log(JSON.stringify(details))}
       {details && (
-        <div className={classes.details}>
-          <h2 className={classes.heading}>{details.name}</h2>
+        <div className={classes.details} data-testid="details">
+          <h2 className={classes.heading} data-testid={'details_name'}>
+            {details.name}
+          </h2>
           <div className={classes.detailsInfo}>
             <div
               className={classes.cardImg}
@@ -52,7 +55,7 @@ const Details = () => {
                   >
                     <span>{nameFields[elem]}</span>
                     {': '}
-                    <span>{details[elem]}</span>
+                    <span data-testid={`details_${elem}`}>{details[elem]}</span>
                   </li>
                 );
               })}
