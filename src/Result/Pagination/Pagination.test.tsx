@@ -13,7 +13,7 @@ describe('Pagination', () => {
     render(
       <BrowserRouter>
         <Routes location={location}>
-          <Route path="/" element={<Outlet context={{ page: 1, onClick: () => {} }} />}>
+          <Route path="/" element={<Outlet context={{ page: 2, onClick: () => {} }} />}>
             <Route index element={<Pagination />} />
           </Route>
         </Routes>
@@ -25,6 +25,13 @@ describe('Pagination', () => {
       const right = await getByText(document.body, 'Right');
       await user.click(right);
     });
-    expect(location.search).toBe('?page=2');
+    expect(location.search).toBe('?page=3');
+  });
+  test('Click on left button change search params in URL', async () => {
+    await act(async () => {
+      const right = await getByText(document.body, 'Left');
+      await user.click(right);
+    });
+    expect(location.search).toBe('?page=1');
   });
 });

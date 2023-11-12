@@ -1,4 +1,3 @@
-import { vi } from 'vitest';
 import {
   act,
   fireEvent,
@@ -6,27 +5,19 @@ import {
   screen,
   render,
   waitFor,
-  waitForElementToBeRemoved,
 } from '@testing-library/react';
 import mockedData from '../stubs/stub';
-import Details, { loader } from './Details';
+import Details from './Details';
 import { vi } from 'vitest';
 import { DEFAULT_STATE, StateProvider } from '../../StateContext/SearchContext';
 import { MTGModel } from '../../api/api';
 import {
-  BrowserRouter,
-  MemoryRouter,
   Outlet,
-  Route,
   RouterProvider,
-  Routes,
   createBrowserRouter,
   createMemoryRouter,
 } from 'react-router-dom';
 import { routesAllTree } from '../../tests/testUtils';
-import { createMemoryHistory } from 'history';
-import userEvent from '@testing-library/user-event';
-import { loader as detailsLoader } from './Details.tsx';
 
 type RenderedData = Omit<MTGModel, 'colors'>;
 
@@ -48,54 +39,63 @@ describe('Details', () => {
     });
   });
 
-  test('fetching data', async () => {
-    // const routes = createBrowserRouter([
-    //   {
-    //     path: '/cards/details/:id',
-    //     element: <Outlet/>
-    //   }
-    // ]
-    // );
-    const mockedLoader = {
-      loader: detailsLoader,
-    };
-    const spy = vi.spyOn(mockedLoader, 'loader').mockImplementation(() => {
-      return { ...mockedData.cards[1] };
+  test('detailed card component correctly displays the detailed card data', async () => {
+    const routes = createMemoryRouter(
+      [
+        {
+          path: `/`,
+          element: <Details />,
+          loader: () => mockedData.cards[1],
+        },
+      ],
+      { initialEntries: [`/`] },
+    );
+    await act(async () => {
+      render(<RouterProvider router={routes} />);
     });
+
+    const details = screen.getByTestId('details');
+    const renderedAttr: Array<keyof RenderedData> = [
+      'name',
+      'manaCost',
+      'cmc',
+      'type',
+      'set',
+      'setName',
+      'artist',
+    ];
+
+    expect(details).toBeInTheDocument();
+    renderedAttr.forEach((attr) => {
+      expect(screen.getByTestId(`details_${attr}`)).toHaveTextContent(
+        mockedData.cards[1][attr],
+      );
+    });
+  });
+  test('clicking the close button hides the component', async () => {
     const routes = createMemoryRouter(
       [
         {
           path: '/',
           element: <Outlet></Outlet>,
           children: [
-        {
-          path: `/`,
-          element: <Details />,
-          loader: detailsLoader
-        }]},
+            {
+              path: `/details`,
+              element: <Details />,
+              loader: () => mockedData.cards[1],
+            },
+          ],
+        },
       ],
-      { initialEntries: [`/`] },
+      { initialEntries: [`/details`] },
     );
-    render(<RouterProvider router={routes} />);
-    //   <StateProvider defaultState={{...DEFAULT_STATE, result: mockedData.cards}}>
-    //     <MemoryRouter >
-    //       <Routes location={location}>
-    //         <Route path="/cards/details/:id" element={<Outlet context={{card: mockedData.cards[1]}}/>}>
-    //           <Route path="/cards/details/:id" index element={<Details/>} loader={()=>{return {card: mockedData.cards[1]}}} />
-    //         </Route>
-    //       </Routes>
-    //   </MemoryRouter>
-    //     {/* <RouterProvider router={routes}/> */}
-    // </StateProvider> );
-    // expect(spy).toHaveBeenCalled();
+    await act(async () => {
+      render(<RouterProvider router={routes} />);
+    });
 
-    // console.log(location.pathname);
-    //  const cards = await screen.getAllByTestId('card');
-    //  fireEvent.click(cards[1]);
-    //  const spinner = screen.getAllByTestId("spinner")
-    //  await waitForElementToBeRemoved(()=> spinner);
     const details = screen.getByTestId('details');
-    //  expect(details).toBeInTheDocument();
-    //  expect(screen.getByTestId(`details_${'name'}`)).toHaveTextContent(mockedData.cards[1].name+' ')
+    expect(details).toBeInTheDocument();
+    fireEvent.click(screen.getByText('Close'));
+    expect(details).not.toBeInTheDocument();
   });
 });

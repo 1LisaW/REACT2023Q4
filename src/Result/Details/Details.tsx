@@ -34,7 +34,6 @@ const Details = () => {
 
   return (
     <>
-      {console.log(JSON.stringify(details))}
       {details && (
         <div className={classes.details} data-testid="details">
           <h2 className={classes.heading} data-testid={'details_name'}>
