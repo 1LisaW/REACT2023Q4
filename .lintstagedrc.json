@@ -1,0 +1,16 @@
+{
+  "*.ts": [
+    "prettier --write",
+    "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "vitest run --coverage.enabled --coverage.lines=80"
+  ],
+  "*.tsx": [
+    "prettier --write",
+    "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "vitest run --coverage.enabled --coverage.lines=80"
+  ],
+  "*.html": [
+    "prettier --write"
+  ],
+  "*.scss": "prettier --write"
+}
