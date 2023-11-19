@@ -9,7 +9,9 @@ import Root from '../../routes/Root.tsx';
 import { RouterProvider, createMemoryRouter } from 'react-router-dom';
 // import { MemoryHistory, createMemoryHistory } from 'history'
 import Details, { loader as detailsLoader } from '../Details/Details.tsx';
-import { DEFAULT_STATE, StateProvider } from '../../StateContext/SearchContext.tsx';
+import { store } from '../../app/store.tsx';
+import { Provider } from 'react-redux';
+import { renderWithProviders } from '../../app/utils/test-utils.tsx';
 
 type RenderedData = Omit<MTGModel, 'colors'>;
 
@@ -63,9 +65,11 @@ describe('Card component', () => {
   test('Clicking on a card opens a detailed card component', async () => {
     const router = customCreateMemoryRouter(mockedData);
     render(
-      <StateProvider defaultState={{ ...DEFAULT_STATE, result: mockedData.cards }}>
+      <Provider store={store}>
+        {/* <StateProvider defaultState={{ ...DEFAULT_STATE, result: mockedData.cards }}> */}
         <RouterProvider router={router} />
-      </StateProvider>,
+        {/* </StateProvider> */}
+      </Provider>,
     );
     const user = userEvent.setup();
     await waitFor(async () => {
@@ -109,12 +113,15 @@ describe('Card component', () => {
       initialEntries: ['/', `/cards`],
       initialIndex: 0,
     });
+    renderWithProviders(<RouterProvider router={router} />);
 
-    render(
-      <StateProvider defaultState={{ ...DEFAULT_STATE, result: mockedData.cards }}>
-        <RouterProvider router={router} />
-      </StateProvider>,
-    );
+    // render(
+    //   <Provider store = {store}>
+    //   {/* <StateProvider defaultState={{ ...DEFAULT_STATE, result: mockedData.cards }}> */}
+    //     <RouterProvider router={router} />
+    //   {/* </StateProvider>, */}
+    //   </Provider>
+    // );
     const user = userEvent.setup();
     await waitFor(async () => {
       const cardWrapper = await getByTestId(document.body, 'cards');

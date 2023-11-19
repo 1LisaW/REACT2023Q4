@@ -4,8 +4,10 @@ import '@testing-library/jest-dom';
 import SearchResult from './SearchResult';
 import mockedData from './stubs/stub.tsx';
 import Root from '../routes/Root.tsx';
-import { DEFAULT_STATE, StateProvider } from '../StateContext/SearchContext.tsx';
+// import { DEFAULT_STATE, StateProvider } from '../StateContext/SearchContext.tsx';
 import { MTGModel } from '../api/api.tsx';
+import { Provider } from 'react-redux';
+import { store } from '../app/store.tsx';
 
 describe('Search result component', () => {
   const customCreateMemoryRouter = (
@@ -36,11 +38,13 @@ describe('Search result component', () => {
 
   test('Card List renders the specified number of cards', async () => {
     const router = customCreateMemoryRouter(mockedData);
-
+    // renderWithProviders(<RouterProvider router={router} />);
     render(
-      <StateProvider defaultState={{ ...DEFAULT_STATE, result: mockedData.cards }}>
+      <Provider store={store}>
+        {/* <StateProvider defaultState={{ ...DEFAULT_STATE, result: mockedData.cards }}> */}
         <RouterProvider router={router} />
-      </StateProvider>,
+        {/* </StateProvider>, */}
+      </Provider>,
     );
     await waitFor(() => {
       const cards = getByTestId(document.body, 'cards');
@@ -51,9 +55,11 @@ describe('Search result component', () => {
   test('Appropriate message is displayed if no cards are present', async () => {
     const router = customCreateMemoryRouter({ cards: [] });
     render(
-      <StateProvider defaultState={{ ...DEFAULT_STATE, result: [] }}>
+      <Provider store={store}>
+        {/* <StateProvider defaultState={{ ...DEFAULT_STATE, result: [] }}> */}
         <RouterProvider router={router} />
-      </StateProvider>,
+        {/* </StateProvider>, */}
+      </Provider>,
     );
     await waitFor(() => {
       const cards = getByTestId(document.body, 'cards');

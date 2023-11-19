@@ -10,6 +10,8 @@ import Details from './Result/Details/Details';
 import { loader as resLoader } from './routes/Root';
 import { loader as detailsLoader } from './Result/Details/Details';
 import { StateProvider } from './StateContext/SearchContext';
+import { Provider } from 'react-redux';
+import { store } from './app/store';
 
 const router = createBrowserRouter([
   {
@@ -46,7 +48,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ErrorBoundary>
       <StateProvider>
-        <RouterProvider router={router} />
+        <Provider store={store}>
+          <RouterProvider router={router} />
+        </Provider>
       </StateProvider>
     </ErrorBoundary>
   </React.StrictMode>,

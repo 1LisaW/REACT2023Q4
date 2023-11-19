@@ -10,15 +10,59 @@ import {
 } from 'react-router-dom';
 import { MTGModel } from '../api/api';
 import Spinner from '../Spinner/Spinner';
-import { useStateStore } from '../StateContext/SearchContext';
+// import { useStateStore } from '../StateContext/SearchContext';
 import Pagination from './Pagination/Pagination';
+import { useTextSelector } from '../app/slices/searchTextSlice';
+import { useGetMTGCardsQuery } from '../app/services/api';
+import { usePageSelector } from '../app/slices/pageSlice';
+import { usePageSizeSelector } from '../app/slices/pageSizeSlice';
+import {
+  toggleLoadingCards,
+  toggleLoadingDetails,
+  useLoadingSelector,
+} from '../app/slices/loadingSlice';
+import { useEffect } from 'react';
+import { useAppDispatch } from '../app/store';
 
 const SearchResult = () => {
   const [searchParams] = useSearchParams();
   const { id: currId } = useParams();
   const navigation = useNavigation();
-  const { text, result } = useStateStore();
+  const text = useTextSelector();
+  const page = usePageSelector();
+  const pageSize = usePageSizeSelector();
+  const loadings = useLoadingSelector();
+  const dispatch = useAppDispatch();
+  const { data } = useGetMTGCardsQuery({
+    name: text,
+    page: String(page),
+    pageSize: String(pageSize),
+  });
+  // const { text, result } = useStateStore();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!navigation || !navigation.location) {
+      dispatch(toggleLoadingCards(false));
+      dispatch(toggleLoadingDetails(false));
+      return;
+    }
+    if (navigation.state === 'loading') {
+      if (navigation.location.pathname === '/cards') dispatch(toggleLoadingCards(true));
+      else dispatch(toggleLoadingDetails(true));
+    } else if (
+      navigation.location &&
+      navigation.location.pathname === '/cards' &&
+      loadings.loadingCards
+    )
+      dispatch(toggleLoadingCards(false));
+    else if (
+      navigation.location &&
+      navigation.location.pathname !== '/cards' &&
+      loadings.loadingDetails
+    )
+      dispatch(toggleLoadingDetails(false));
+  }, [navigation.state, navigation.location]);
 
   const goToDetails = (id: string) => {
     const searchParamsText = `?${createSearchParams({
@@ -43,10 +87,10 @@ const SearchResult = () => {
     <>
       <div className={classes.main} data-testid="cards">
         <div className={classes.list}>
-          {navigation.state == 'loading' && navigation.location.pathname == '/cards' ? (
+          {loadings.loadingCards ? (
             <Spinner />
-          ) : result && result.length > 0 ? (
-            result.map((item: MTGModel) => {
+          ) : data && data.cards && data.cards.length > 0 ? (
+            data.cards.map((item: MTGModel) => {
               return (
                 <a
                   onClick={() => {
@@ -66,15 +110,13 @@ const SearchResult = () => {
           )}
         </div>
         <div className={classes.details}>
-          {navigation.state == 'loading' && navigation.location.pathname !== '/cards' ? (
-            <Spinner />
-          ) : (
-            <Outlet></Outlet>
-          )}
+          {loadings.loadingDetails ? <Spinner /> : <Outlet></Outlet>}
         </div>
       </div>
       {(navigation.state !== 'loading' || navigation.location.pathname !== '/cards') &&
-        result.length > 0 && <Pagination />}
+        data &&
+        data.cards &&
+        data.cards.length > 0 && <Pagination />}
     </>
   );
 };

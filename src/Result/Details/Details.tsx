@@ -2,20 +2,23 @@ import {
   LoaderFunction,
   useSearchParams,
   useNavigate,
-  useLoaderData,
   createSearchParams,
+  useParams,
 } from 'react-router-dom';
-import { MTGModel, getMTGCardsDataDetail } from '../../api/api';
+import { MTGModel } from '../../api/api';
 
 import classes from './Details.module.css';
+import { cardMTGsApi, useGetMTGCardQuery } from '../../app/services/api';
+import { store } from '../../app/store';
 
-export const loader: LoaderFunction = async ({ params }): Promise<MTGModel | null> => {
+export const loader: LoaderFunction = async ({
+  params,
+}): Promise<Record<'card', MTGModel> | null> => {
   const id = params.id;
-  if (!id) {
-    return null;
+  if (id) {
+    await store.dispatch(cardMTGsApi.endpoints.getMTGCard.initiate({ id }));
   }
-  const searchData = await getMTGCardsDataDetail(id);
-  return searchData;
+  return null;
 };
 
 const nameFields: Omit<MTGModel, 'colors' | 'name' | 'imageUrl' | 'id'> = {
@@ -29,32 +32,33 @@ const nameFields: Omit<MTGModel, 'colors' | 'name' | 'imageUrl' | 'id'> = {
 
 const Details = () => {
   const navigate = useNavigate();
-  const details = useLoaderData() as MTGModel | null;
+  const { id: currId } = useParams();
+  const { data } = useGetMTGCardQuery({ id: currId || '' });
   const [searchParams] = useSearchParams();
 
   return (
     <>
-      {details && (
+      {data?.card && (
         <div className={classes.details} data-testid="details">
           <h2 className={classes.heading} data-testid={'details_name'}>
-            {details.name}
+            {data.card.name}
           </h2>
           <div className={classes.detailsInfo}>
             <div
               className={classes.cardImg}
-              style={{ backgroundImage: `url(${details.imageUrl}` }}
-              key={`img_${details.id}`}
+              style={{ backgroundImage: `url(${data.card.imageUrl}` }}
+              key={`img_${data.card.id}`}
             ></div>
             <ul className={classes.features}>
               {(Object.keys(nameFields) as Array<keyof typeof nameFields>).map((elem) => {
                 return (
                   <li
                     className={classes.infoLine}
-                    key={`feature_${details.id}_${nameFields[elem]}`}
+                    key={`feature_${data.card.id}_${nameFields[elem]}`}
                   >
                     <span>{nameFields[elem]}</span>
                     {': '}
-                    <span data-testid={`details_${elem}`}>{details[elem]}</span>
+                    <span data-testid={`details_${elem}`}>{data.card[elem]}</span>
                   </li>
                 );
               })}

@@ -9,6 +9,8 @@ import { describe } from 'vitest';
 import Search from './Search';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import { getStorageData, setStorageData } from '../store/storage';
+import { Provider } from 'react-redux';
+import { store } from '../app/store';
 
 describe('Search component', () => {
   const router = createBrowserRouter([
@@ -21,7 +23,11 @@ describe('Search component', () => {
 
   beforeEach(() => {
     setStorageData('default search');
-    return render(<RouterProvider router={router} />);
+    return render(
+      <Provider store={store}>
+        <RouterProvider router={router} />
+      </Provider>,
+    );
   });
 
   test('component retrieves the value from the local storage upon mounting', async () => {
