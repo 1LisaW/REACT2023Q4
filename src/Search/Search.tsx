@@ -16,7 +16,7 @@ const Search = () => {
       role="search"
       relative="path"
       onSubmit={() => {
-        dispatch(setSearchText(searchValue));
+        dispatch(setSearchText(searchValue || ''));
         setStorageData(searchValue);
       }}
     >

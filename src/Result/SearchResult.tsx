@@ -1,5 +1,4 @@
 import classes from './SearchResult.module.css';
-import Card from './Card/Card';
 import {
   useNavigation,
   useSearchParams,
@@ -10,7 +9,6 @@ import {
 } from 'react-router-dom';
 import { MTGModel } from '../api/api';
 import Spinner from '../Spinner/Spinner';
-// import { useStateStore } from '../StateContext/SearchContext';
 import Pagination from './Pagination/Pagination';
 import { useTextSelector } from '../app/slices/searchTextSlice';
 import { useGetMTGCardsQuery } from '../app/services/api';
@@ -23,6 +21,7 @@ import {
 } from '../app/slices/loadingSlice';
 import { useEffect } from 'react';
 import { useAppDispatch } from '../app/store';
+import Card from './Card/Card';
 
 const SearchResult = () => {
   const [searchParams] = useSearchParams();
@@ -38,7 +37,6 @@ const SearchResult = () => {
     page: String(page),
     pageSize: String(pageSize),
   });
-  // const { text, result } = useStateStore();
   const navigate = useNavigate();
 
   useEffect(() => {

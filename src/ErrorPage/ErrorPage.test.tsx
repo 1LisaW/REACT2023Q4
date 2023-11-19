@@ -8,10 +8,7 @@ import ErrorPage from './ErrorPage';
 describe('Error page', () => {
   beforeAll(vi.resetAllMocks);
   const globConsole = console.log;
-  // beforeEach(() => {
   console.log = vi.fn();
-  // expect(console.log).toHaveBeenCalled();
-  // });
   afterAll(() => (console.log = globConsole));
   const routes = createMemoryRouter(
     [

@@ -7,7 +7,6 @@ import { searchText } from './slices/searchTextSlice';
 import { loading } from './slices/loadingSlice';
 
 export const createStore = () =>
-  // options?: ConfigureStoreOptions['preloadedState'] | undefined
   configureStore({
     reducer: {
       searchText: searchText.reducer,

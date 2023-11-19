@@ -6,17 +6,15 @@ import type { PreloadedState } from '@reduxjs/toolkit';
 import { Provider } from 'react-redux';
 
 import type { RootState } from '../store';
-// As a basic setup, import your same slice reducers
-import { searchText } from '../slices/searchTextSlice';
 import { page } from '../slices/pageSlice';
 import { loading } from '../slices/loadingSlice';
 import { pageSize } from '../slices/pageSizeSlice';
 import { cardMTGsApi } from '../services/api';
 
-const setupStore = (preloadedState?: PreloadedState<RootState>) => {
+export const setupStore = (preloadedState?: PreloadedState<RootState>) => {
   return configureStore({
     reducer: {
-      searchText: searchText.reducer,
+      // searchText: searchText.reducer,
       page: page.reducer,
       pageSize: pageSize.reducer,
       loadings: loading.reducer,

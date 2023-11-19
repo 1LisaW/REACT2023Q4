@@ -1,5 +1,4 @@
 import { createApi, fetchBaseQuery, retry } from '@reduxjs/toolkit/query/react';
-// import { RootState } from '../store'
 import { MTGModel } from '../../api/api';
 
 const BASE_URL = 'https://api.magicthegathering.io/v1/';
@@ -17,7 +16,7 @@ export const cardMTGsApi = createApi({
       { name: string; page: string; pageSize: string }
     >({
       query(arg) {
-        const { name, page, pageSize } = arg;
+        const { name = '', page = '1', pageSize = '3' } = arg;
         return {
           url: 'cards',
           params: { name, page, pageSize },

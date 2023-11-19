@@ -1,7 +1,7 @@
 import { Color, MTGCardDTO } from './mtg';
 
 export const MOCK_IMG = 'https://starwars-visualguide.com/assets/img/big-placeholder.jpg';
-const MTG_API_URL = 'https://api.magicthegathering.io/v1/';
+export const MTG_API_URL = 'https://api.magicthegathering.io/v1/';
 
 type MTGOptions = {
   pageSize: number;

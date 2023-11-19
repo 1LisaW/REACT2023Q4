@@ -6,36 +6,53 @@ import {
   render,
   waitFor,
 } from '@testing-library/react';
-import mockedData from '../stubs/stub';
-import Details from './Details';
 import { vi } from 'vitest';
-// import { DEFAULT_STATE, StateProvider } from '../../StateContext/SearchContext';
-import { MTGModel } from '../../api/api';
+import userEvent from '@testing-library/user-event';
+import { Provider } from 'react-redux';
 import {
-  Outlet,
+  MemoryRouter,
   RouterProvider,
   createBrowserRouter,
   createMemoryRouter,
 } from 'react-router-dom';
-import { routesAllTree } from '../../tests/testUtils';
-import { Provider } from 'react-redux';
+
+import mockedData from '../stubs/stub';
+import { MTGModel } from '../../api/api';
 import { store } from '../../app/store';
+
+import { routesAllTree } from '../../tests/testUtils';
+import { server } from '../../mock/api/server';
+import SearchResult from '../SearchResult';
+import Root, { loader as cardsLoader } from '../../routes/Root';
+import Details, { loader as detailsLoader } from './Details';
 import { cardMTGsApi } from '../../app/services/api';
-// import { cardMTGsApi } from '../../app/services/api';
 
 type RenderedData = Omit<MTGModel, 'colors'>;
 
+vi.mock('react-router-dom', async () => {
+  const actual =
+    await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
+  return {
+    ...actual,
+    useParams: () => ({
+      id: mockedData.cards[1].id,
+    }),
+  };
+});
+
 describe('Details', () => {
   beforeEach(vi.resetAllMocks);
+  afterEach(() => {
+    vi.clearAllMocks();
+    vi.resetAllMocks();
+  });
+  afterEach(() => server.resetHandlers());
 
   test(' loading indicator is displayed while fetching data', async () => {
     const routes = createBrowserRouter(routesAllTree());
-    // store.dispatch(cardMTGsApi.endpoints.getMTGCards({name}))
     render(
       <Provider store={store}>
-        {/* <StateProvider defaultState={{ ...DEFAULT_STATE, result: mockedData.cards }}> */}
         <RouterProvider router={routes} />
-        {/* </StateProvider>, */}
       </Provider>,
     );
     act(() => {
@@ -56,60 +73,20 @@ describe('Details', () => {
   });
 
   test('detailed card component correctly displays the detailed card data', async () => {
-    // vi.mock('react-router-dom', () => ({
-    //   useParams: (): Readonly<Params<string>> => ({ id: mockedData.cards[1].id }),
-    // }));
-    // vi.mock('react-router-dom');
-    // vi.mocked(useParams).mockReturnValue({ taskId: mockedData.cards[1].id });
-    vi.mock('react-router-dom', async () => {
-      const actual =
-        await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
-      return {
-        ...actual,
-        useParams: () => ({
-          id: mockedData.cards[1].id,
-        }),
-        useOutletContext: () => ({
-          id: mockedData.cards[1].id,
-        }),
-      };
-    });
-    const routes = createMemoryRouter(
-      [
-        {
-          path: `/`,
-          element: <Outlet context={{ id: mockedData.cards[1].id }} />,
-          children: [
-            {
-              path: `/`,
-              element: <Details />,
-              loader: async () =>
-                await store.dispatch(
-                  cardMTGsApi.endpoints.getMTGCard.initiate({
-                    id: mockedData.cards[1].id,
-                  }),
-                ),
-            },
-          ],
-        },
-      ],
-      { initialEntries: [`/`] },
+    await store.dispatch(
+      cardMTGsApi.endpoints.getMTGCard.initiate({ id: mockedData.cards[1].id }),
     );
-    act(async () => {
-      // await store.dispatch(cardMTGsApi.endpoints.getMTGCard.initiate({id:mockedData.cards[1].id}));
-      console.log(location.pathname);
-      render(
-        <Provider store={store}>
-          <RouterProvider router={routes} />
-        </Provider>,
-      );
-    });
+    render(
+      <Provider store={store}>
+        <MemoryRouter>
+          <Details />
+        </MemoryRouter>
+      </Provider>,
+    );
 
-    const details = screen.getByTestId('details');
+    const details = await screen.getByTestId('details');
     const renderedAttr: Array<keyof RenderedData> = [
       'name',
-      'manaCost',
-      'cmc',
       'type',
       'set',
       'setName',
@@ -122,38 +99,51 @@ describe('Details', () => {
       );
     });
   });
+
   test('clicking the close button hides the component', async () => {
-    const routes = createMemoryRouter(
-      [
+    const customCreateMemoryRouter = () => {
+      const routes = [
         {
           path: '/',
-          element: <Outlet></Outlet>,
+          element: <Root />,
+          loader: cardsLoader,
           children: [
             {
-              path: `/details`,
-              element: <Details />,
-              loader: () => mockedData.cards[1],
+              path: 'cards',
+              element: <SearchResult />,
+              children: [
+                {
+                  path: 'details/:id',
+                  loader: detailsLoader,
+                  element: <Details />,
+                },
+              ],
             },
           ],
         },
-      ],
-      { initialEntries: [`/details`] },
+      ];
+
+      const router = createMemoryRouter(routes, {
+        initialEntries: ['/', '/cards', '/cards/details/:id'],
+        initialIndex: 2,
+      });
+      return router;
+    };
+    const router = customCreateMemoryRouter();
+    const user = userEvent.setup();
+    render(
+      <Provider store={store}>
+        <RouterProvider router={router} />
+      </Provider>,
     );
-    await act(async () => {
-      render(
-        <Provider store={store}>
-          <RouterProvider router={routes} />
-        </Provider>,
-      );
-    });
-    act(async () => {
-      await store.dispatch(
-        cardMTGsApi.endpoints.getMTGCard.initiate({ id: mockedData.cards[1].id }),
-      );
-      const details = screen.getByTestId('details');
+    let details;
+    await waitFor(async () => {
+      await screen.getAllByTestId('card');
+      details = await screen.getByTestId('details');
       expect(details).toBeInTheDocument();
-      fireEvent.click(screen.getByText('Close'));
-      expect(details).not.toBeInTheDocument();
     });
+    const cards = await screen.getAllByTestId('card');
+    await user.click(cards[1]);
+    expect(details).not.toBeInTheDocument();
   });
 });

@@ -27,7 +27,6 @@ const Root = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  console.log(page);
 
   useEffect(() => {
     if (window.location.pathname === '/') {
