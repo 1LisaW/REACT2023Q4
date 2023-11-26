@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 coverage
+migate_to_next
+.next
+.vite
 
 # Editor directories and files
 .vscode/*
