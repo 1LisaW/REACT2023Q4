@@ -45,6 +45,14 @@ vi.mock('../../../app/store', () => {
     useAppDispatch: () => mockUseDispatch,
   };
 });
+vi.mock('next/navigation', async () => {
+  const actual =
+    await vi.importActual<typeof import('next/navigation')>('next/navigation');
+  return {
+    ...actual,
+    useSearchParams: () => new URLSearchParams(),
+  };
+});
 
 describe('Details', () => {
   beforeEach(vi.resetAllMocks);
