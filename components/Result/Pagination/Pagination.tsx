@@ -16,10 +16,9 @@ const Pagination = () => {
   const router = useRouter();
   const { query } = router;
   const dispatch = useAppDispatch();
+  console.log(dispatch);
   const searchParams = useSearchParams();
   const page = query.page || 1;
-  // const content: OutletProps = useOutletContext();
-  // const [searchParams, setSearchParams] = useSearchParams();
 
   const handleClick = (value: number) => {
     dispatch(setFromQueryParams(value));

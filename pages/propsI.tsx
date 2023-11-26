@@ -7,5 +7,5 @@ export default interface PropsI {
   pageSize: string;
   loadings: LoadingState;
   cards: { cards: MTGModel[] | never[] };
-  details?: { card: MTGModel | never };
+  details?: Record<'card', MTGModel> | null;
 }

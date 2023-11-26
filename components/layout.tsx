@@ -6,6 +6,8 @@ import Header from '../components/Header/Header';
 import Search from '../components/Search/Search';
 import PropsI from '../pages/propsI';
 import SearchResult from '../components/Result/SearchResult';
+import PageSizeComponent from './PageSize/PageSize';
+import Pagination from './Result/Pagination/Pagination';
 
 const name = 'RTK-Query SSR example';
 export const siteTitle = name;
@@ -32,11 +34,15 @@ export default function Layout({
         <meta name="og:title" content={siteTitle} />
         <meta name="twitter:card" content="summary_large_image" />
       </Head>
-      <Header />
       <main>
+        <Header />
         <Search name={data.name} />
-        <SearchResult data={data} />
-        {children}
+        <PageSizeComponent pageSize={data.pageSize} />
+        <div className={styles.result}>
+          <SearchResult data={data} />
+          {children}
+        </div>
+        <Pagination />
       </main>
     </div>
   );

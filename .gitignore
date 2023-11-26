@@ -12,7 +12,7 @@ dist
 dist-ssr
 *.local
 coverage
-migate_to_next
+migrate_to_next
 .next
 .vite
 

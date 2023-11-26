@@ -1,25 +1,10 @@
-import {
-  LoaderFunction,
-  useSearchParams,
-  useNavigate,
-  createSearchParams,
-  useParams,
-} from 'react-router-dom';
-import { MTGModel } from '../../api/api';
-
 import classes from './Details.module.css';
-import { cardMTGsApi, useGetMTGCardQuery } from '../../app/services/api';
-import { store } from '../../app/store';
-
-export const loader: LoaderFunction = async ({
-  params,
-}): Promise<Record<'card', MTGModel> | null> => {
-  const id = params.id;
-  if (id) {
-    await store.dispatch(cardMTGsApi.endpoints.getMTGCard.initiate({ id }));
-  }
-  return null;
-};
+import PropsI from '../../../pages/propsI';
+import React from 'react';
+import { MTGModel } from '../../../app/api/api';
+import { useRouter } from 'next/router';
+import { useAppDispatch } from '../../../app/store';
+import { toggleLoadingDetails } from '../../../app/slices/loadingSlice';
 
 const nameFields: Omit<MTGModel, 'colors' | 'name' | 'imageUrl' | 'id'> = {
   manaCost: 'mana cost',
@@ -30,35 +15,35 @@ const nameFields: Omit<MTGModel, 'colors' | 'name' | 'imageUrl' | 'id'> = {
   artist: 'artist',
 };
 
-const Details = () => {
-  const navigate = useNavigate();
-  const { id: currId } = useParams();
-  const { data } = useGetMTGCardQuery({ id: currId || '' });
-  const [searchParams] = useSearchParams();
+const Details = ({ data }: { data: PropsI }) => {
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+  const { details } = data;
+  const card = details?.card;
 
   return (
     <>
-      {data?.card && (
+      {card && (
         <div className={classes.details} data-testid="details">
           <h2 className={classes.heading} data-testid={'details_name'}>
-            {data.card.name}
+            {card.name}
           </h2>
           <div className={classes.detailsInfo}>
             <div
               className={classes.cardImg}
-              style={{ backgroundImage: `url(${data.card.imageUrl}` }}
-              key={`img_${data.card.id}`}
+              style={{ backgroundImage: `url(${card.imageUrl}` }}
+              key={`img_${card.id}`}
             ></div>
             <ul className={classes.features}>
               {(Object.keys(nameFields) as Array<keyof typeof nameFields>).map((elem) => {
                 return (
                   <li
                     className={classes.infoLine}
-                    key={`feature_${data.card.id}_${nameFields[elem]}`}
+                    key={`feature_${card.id}_${nameFields[elem]}`}
                   >
                     <span>{nameFields[elem]}</span>
                     {': '}
-                    <span data-testid={`details_${elem}`}>{data.card[elem]}</span>
+                    <span data-testid={`details_${String(elem)}`}>{card[elem]}</span>
                   </li>
                 );
               })}
@@ -66,12 +51,8 @@ const Details = () => {
           </div>
           <button
             onClick={() => {
-              const searchParamsText = `?${createSearchParams({
-                name: searchParams.get('name') || '',
-                page: searchParams.get('page') || '1',
-                pageSize: searchParams.get('pageSize') || '3',
-              })}`;
-              navigate(`../..${searchParamsText}`, { relative: 'path' });
+              dispatch(toggleLoadingDetails(true));
+              router.back();
             }}
           >
             Close

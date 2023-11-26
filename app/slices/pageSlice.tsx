@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
-import type { PayloadAction } from '@reduxjs/toolkit';
+import type { Draft, PayloadAction } from '@reduxjs/toolkit';
+import { HYDRATE } from 'next-redux-wrapper';
 import { useTypedSelector } from '../store';
 
 interface PageState {
@@ -21,6 +22,13 @@ export const page = createSlice({
     setFromQueryParams(state, action: PayloadAction<number>) {
       state.page = action.payload;
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(HYDRATE, (_state: Draft<PageState>) => {
+      return {
+        ..._state,
+      };
+    });
   },
 });
 

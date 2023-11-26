@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
-import type { PayloadAction } from '@reduxjs/toolkit';
+import type { Draft, PayloadAction } from '@reduxjs/toolkit';
 import { useTypedSelector } from '../store';
+import { HYDRATE } from 'next-redux-wrapper';
 
 interface PageSizeState {
   pageSize: number;
@@ -15,6 +16,13 @@ export const pageSize = createSlice({
     setPageSize(state, action: PayloadAction<number>) {
       state.pageSize = action.payload;
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(HYDRATE, (_state: Draft<PageSizeState>) => {
+      return {
+        ..._state,
+      };
+    });
   },
 });
 

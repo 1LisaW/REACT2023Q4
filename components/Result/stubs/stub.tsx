@@ -1,4 +1,4 @@
-import { MTGModel } from '../../api/api';
+import { MTGModel } from '../../../app/api/api';
 
 const mockedData: Record<'cards', MTGModel[]> = {
   cards: [

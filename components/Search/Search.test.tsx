@@ -7,27 +7,36 @@ import {
 import { vi } from 'vitest';
 import { describe } from 'vitest';
 import Search from './Search';
-import { RouterProvider, createBrowserRouter } from 'react-router-dom';
-import { getStorageData, setStorageData } from '../store/storage';
-import { Provider } from 'react-redux';
-import { store } from '../app/store';
+import { getStorageData, setStorageData } from '../../app/services/storage';
+import React from 'react';
+
+const mockUseDispatch = vi.fn();
+vi.mock('../../app/store', () => {
+  return {
+    useAppDispatch: () => mockUseDispatch,
+  };
+});
 
 describe('Search component', () => {
-  const router = createBrowserRouter([
-    {
-      path: '/',
-      element: <Search />,
-    },
-  ]);
   beforeAll(vi.resetAllMocks);
 
   beforeEach(() => {
     setStorageData('default search');
-    return render(
-      <Provider store={store}>
-        <RouterProvider router={router} />
-      </Provider>,
-    );
+    return render(<Search name={'default search'} />);
+  });
+
+  vi.mock('../../app/slices/pageSizeSlice', async () => {
+    return {
+      usePageSizeSelector: () => '3',
+    };
+  });
+  vi.mock('next/navigation', async () => {
+    const actual =
+      await vi.importActual<typeof import('next/navigation')>('next/navigation');
+    return {
+      ...actual,
+      useSearchParams: () => new URLSearchParams(),
+    };
   });
 
   test('component retrieves the value from the local storage upon mounting', async () => {
@@ -40,7 +49,7 @@ describe('Search component', () => {
     fireEvent.change(getByPlaceholderText(document.body, 'Search'), {
       target: { value: 'oo' },
     });
-    fireEvent.click(getByText(document.body, 'Search'));
+    fireEvent.submit(getByText(document.body, 'Search'));
     expect(getStorageData()).toBe('oo');
   });
 });

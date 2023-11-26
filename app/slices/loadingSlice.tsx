@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import type { PayloadAction } from '@reduxjs/toolkit';
+import type { Draft, PayloadAction } from '@reduxjs/toolkit';
 import { useTypedSelector } from '../store';
 
 export interface LoadingState {
@@ -8,6 +8,7 @@ export interface LoadingState {
 }
 
 const initialState = { loadingCards: false, loadingDetails: false } as LoadingState;
+import { HYDRATE } from 'next-redux-wrapper';
 
 export const loading = createSlice({
   name: 'loading',
@@ -19,6 +20,11 @@ export const loading = createSlice({
     toggleLoadingDetails(state, action: PayloadAction<boolean>) {
       state.loadingDetails = action.payload;
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(HYDRATE, (_state: Draft<LoadingState>) => {
+      return { ..._state };
+    });
   },
 });
 

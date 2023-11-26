@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import type { PayloadAction } from '@reduxjs/toolkit';
+import type { Draft, PayloadAction } from '@reduxjs/toolkit';
 import { HYDRATE } from 'next-redux-wrapper';
 // import { getStorageData } from '../services/storage';
 import { useTypedSelector } from '../store';
@@ -18,13 +18,13 @@ export const searchText = createSlice({
       state.text = action.payload;
     },
   },
-  extraReducers: {
-    [HYDRATE]: (state, action) => {
+  extraReducers: (builder) => {
+    builder.addCase(HYDRATE, (_state: Draft<SearchTextState>) => {
+      console.log(_state);
       return {
-        ...state,
-        ...action.payload.auth,
+        ..._state,
       };
-    },
+    });
   },
 });
 

@@ -5,6 +5,7 @@ import { useAppDispatch } from '../../app/store';
 import { setSearchText } from '../../app/slices/searchTextSlice';
 import React from 'react';
 import { useSearchParams } from 'next/navigation';
+import { usePageSizeSelector } from '../../app/slices/pageSizeSlice';
 
 const Search = (props: { name: string }) => {
   const { name } = props;
@@ -21,7 +22,7 @@ const Search = (props: { name: string }) => {
         if (window) setStorageData(searchValue);
       }}
     >
-      <input type="hidden" name="pageSize" value={searchParams.get('pageSize') || ''} />
+      <input type="hidden" name="pageSize" value={usePageSizeSelector() || ''} />
       <input type="hidden" name="page" value={searchParams.get('page') || '1'} />
       <input
         className={classes.inputSearch}

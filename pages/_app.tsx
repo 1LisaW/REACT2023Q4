@@ -1,16 +1,18 @@
 import '../styles/global.css';
-import { wrapper } from '../app/store.tsx';
+import { createStore, wrapper } from '../app/store.tsx';
 import React from 'react';
 import ErrorBoundary from '../components/ErrorBoundary.tsx';
+import { Provider } from 'react-redux';
 
 export function App({ Component, pageProps }) {
+  const { store } = wrapper.useWrappedStore(createStore);
   return (
-    <div>
+    <Provider store={store}>
       <ErrorBoundary>
         <Component {...pageProps} />;
       </ErrorBoundary>
-    </div>
+    </Provider>
   );
 }
 
-export default wrapper.withRedux(App);
+export default App;
