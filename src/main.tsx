@@ -7,13 +7,14 @@ import AuthHookForm from './components/AppHookForm/AuthHookForm';
 import AuthForm from './AuthForm';
 import { Provider } from 'react-redux';
 import './index.css';
+import App from './App';
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: (
       <div>
-        Hello
+        <App/>
         <nav>
           <ul>
             <li>

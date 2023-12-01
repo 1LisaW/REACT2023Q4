@@ -23,4 +23,4 @@ export const gender = createSlice({
 
 export const { setGender } = gender.actions;
 export default gender.reducer;
-export const useGenderSelector = () => useTypedSelector((state) => state.name);
+export const useGenderSelector = () => useTypedSelector((state) => state.gender);

@@ -20,4 +20,4 @@ export const avatar = createSlice({
 
 export const { setAvatar } = avatar.actions;
 export default avatar.reducer;
-export const useNameSelector = () => useTypedSelector((state) => state.name);
+export const useAvatarSelector = () => useTypedSelector((state) => state.name);

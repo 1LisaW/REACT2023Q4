@@ -23,4 +23,4 @@ export const country = createSlice({
 
 export const { setCountry } = country.actions;
 export default country.reducer;
-export const useNameSelector = () => useTypedSelector((state) => state.name);
+export const useCountrySelector = () => useTypedSelector((state) => state.country);

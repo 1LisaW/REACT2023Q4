@@ -20,4 +20,4 @@ export const age = createSlice({
 
 export const { setAge } = age.actions;
 export default age.reducer;
-export const useNameSelector = () => useTypedSelector((state) => state.name);
+export const useAgeSelector = () => useTypedSelector((state) => state.age);
