@@ -4,7 +4,6 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import { useTypedSelector } from '../store';
 import { genderList } from '../../constants';
 
-
 interface GenderState {
   gender: string | undefined;
   genderList: typeof genderList;

@@ -1,12 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-// import App from './App.tsx'
-import './index.css';
 import { Link, Outlet, RouterProvider, createBrowserRouter } from 'react-router-dom';
 import { store } from './store/store';
 
+import AuthHookForm from './components/AppHookForm/AuthHookForm';
 import AuthForm from './AuthForm';
 import { Provider } from 'react-redux';
+import './index.css';
 
 const router = createBrowserRouter([
   {
@@ -32,13 +32,13 @@ const router = createBrowserRouter([
         path: 'auth',
         element: (
           <div>
-            <AuthForm/>
+            <AuthForm />
           </div>
         ),
       },
       {
         path: 'smth',
-        element: <div>smth</div>,
+        element: <AuthHookForm/>
       },
     ],
   },

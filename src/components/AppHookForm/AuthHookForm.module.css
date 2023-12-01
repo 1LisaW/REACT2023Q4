@@ -10,13 +10,6 @@ ul {
   text-indent: 0.5rem;
   /* display: flex; */
 }
-.item {
-  display: flex;
-  min-width: 605px;
-  text-indent: 0.5rem;
-  flex-direction: column;
-  height: 80px;
-}
 .warning {
   padding: 0;
   margin: 0;
