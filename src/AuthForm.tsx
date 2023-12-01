@@ -10,6 +10,9 @@ import { setGender } from './store/slices/genderSlice';
 import { setPassword } from './store/slices/passwordSlice';
 import { setCountry } from './store/slices/countrySlice';
 import { useAppDispatch } from './store/store';
+import AvatarInput from './components/avatarInput';
+import { setAvatar } from './store/slices/avatarSlice';
+import convertBase64 from './services/convertBase64';
 // import { yupResolver } from "@hookform/resolvers";
 // import { ValidationError } from 'yup';
 
@@ -45,6 +48,17 @@ const validationSchema = yup.object().shape({
   .oneOf([yup.ref('password'), ''], 'Passwords must match'),
   accept: yup.boolean()
     .isTrue('accept terms'),
+  avatar: yup.mixed()
+    .nullable()
+    .required('upload avatar img')
+    .test("is valid extension", "Not a valid image extension",
+        (value) => value
+          // && Array.isArray(value)
+          // && typeof(value[0].name) == 'string' )
+            && (value[0].name.toLowerCase().split('.').pop() == 'jpg'
+            || value[0].name.toLowerCase().split('.').pop() == 'png'))
+    .test("is-valid-size", "Max allowed size is 100KB",
+        (value) => value && value[0].size <= 102400)
 });
 
 // interface ExampleForm extends HTMLFormElement {
@@ -60,6 +74,7 @@ type ErrorStateType = {
   password?: string,
   passwordConfirmation?: string,
   accept?: string,
+  avatar?: string,
 };
 
 export default function AuthForm() {
@@ -67,11 +82,9 @@ export default function AuthForm() {
   const [defaultCountry, setSelCountry] = useState<string | undefined>(undefined);
   const [errors, setErrors] = useState<ErrorStateType>({});
   const [disabled, setDisabled] = useState(true);
-  const [confirmed, setConfirmation] = useState(false);
   const dispatch = useAppDispatch();
 
   const handleChange= async(e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
     const form = e.currentTarget;
     const formElements = form.elements as typeof form.elements & {
       name: HTMLInputElement,
@@ -82,7 +95,9 @@ export default function AuthForm() {
       password: HTMLInputElement,
       passwordConfirmation: HTMLInputElement,
       accept: HTMLInputElement,
+      avatar: HTMLInputElement,
     }
+    console.log(formElements);
     const formData = {
       name: formElements.name.value,
       age: formElements.age.value,
@@ -91,7 +106,8 @@ export default function AuthForm() {
       email: formElements.email.value,
       password: formElements.password.value,
       passwordConfirmation: formElements.passwordConfirmation.value,
-      accept: formElements.accept.checked
+      accept: formElements.accept.checked,
+      avatar: formElements.avatar.files,
     };
 
     // const errors: Promise<InferType<Schema>, ValidationError> = validationSchema.validate(formData);
@@ -136,6 +152,7 @@ export default function AuthForm() {
       password: HTMLInputElement,
       passwordConfirmation: HTMLInputElement,
       accept: HTMLInputElement,
+      avatar: HTMLInputElement,
     }
     const formData = {
       name: formElements.name.value,
@@ -146,6 +163,7 @@ export default function AuthForm() {
       password: formElements.password.value,
       passwordConfirmation: formElements.passwordConfirmation.value,
       accept: formElements.accept.value,
+      avatar: formElements.avatar.files,
     };
     dispatch(setUserName(formData.name));
     dispatch(setAge(+formData.age));
@@ -153,6 +171,11 @@ export default function AuthForm() {
     dispatch(setGender(formData.gender));
     dispatch(setCountry(formData.country));
     dispatch(setPassword(formData.password));
+    if (formData.avatar)
+    {
+      const base64 = await convertBase64(formData.avatar[0]) as string;
+      dispatch(setAvatar(base64));
+    }
     console.log('submit!');
   }
 
@@ -220,10 +243,13 @@ export default function AuthForm() {
           <li className={classes.item}>
             <label htmlFor='accept'>accept terms:</label>
               <input id='accept'
-              type="checkbox" checked={(()=>{return confirmed})()} onChange={()=>{
-                setConfirmation(!confirmed)}}/>
+              type="checkbox" />
               {errors.accept && <p className={classes.warning}> {errors.accept} </p>}
 
+          </li>
+          <li className={classes.item}>
+              <AvatarInput/>
+              {errors.avatar && <p className={classes.warning}>{errors.avatar}</p>}
           </li>
         </ul>
         <button type="submit" disabled={disabled}>

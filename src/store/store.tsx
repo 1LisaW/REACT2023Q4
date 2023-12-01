@@ -6,6 +6,7 @@ import { age } from './slices/ageSlice';
 import { gender } from './slices/genderSlice';
 import { country } from './slices/countrySlice';
 import { password } from './slices/passwordSlice';
+import { avatar } from './slices/avatarSlice';
 
 export const createStore = () =>
   configureStore({
@@ -16,6 +17,7 @@ export const createStore = () =>
       gender: gender.reducer,
       country: country.reducer,
       password: password.reducer,
+      avatar: avatar.reducer,
     },
   });
 
