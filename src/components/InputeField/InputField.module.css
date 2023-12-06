@@ -1,0 +1,7 @@
+.item {
+	display: flex;
+	min-width: 605px;
+	text-indent: 0.5rem;
+	flex-direction: column;
+	height: 80px;
+  }
